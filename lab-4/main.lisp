@@ -3,6 +3,51 @@
                  if (eq x y) return T
                  finally (return nil)))
 
+;; Конечный вариант
+;; is-member проверяет, входит ли элемент x в множество s
+(defun is-member (s x)
+  (let ((retval nil))
+    (dolist (y s)
+      (when (eq x y)
+        (setq retval T)
+        (return)))
+    retval))
+
+;; is-subset проверяет, является ли множество B подмножеством A
+(defun is-subset (b a)
+  (let ((retval T))
+    (dotimes (i (length b))
+      (when (null (is-member a (car b)))
+        (setq retval nil)
+        (return))
+      (setq b (cdr b)))
+    retval))
+
+(defun increase-hash (key table)
+  (let ((ref (gethash key table)))
+    (if (null ref) (setf (gethash key table) 1)
+        (incf (gethash key table)))))
+
+;; Макрос increase-hash увеличивает значение хранящееся в хэш-таблице hash
+;; по ключу key на 1, если ключа key нет, добавляет пару с заданным ключом и значением 1
+(defmacro increase-hash (key table)
+  (let ((ref `(gethash ,key ,table)))
+    `(if (null ,ref) (setf ,ref 1)
+         (incf ,ref))))
+
+;; make-enum строит список, определяющий, сколько раз встречается каждый элемент в списке l
+(defun make-enum (l)
+  (do ((dict (make-hash-table)) ; Блок переменных
+       (retval '()))
+      ;; Блок завершающих условий
+      ((null l) ; Если список l пуст - преобразуем хэш-таблицу dict в список retval, возвращаем retval
+       (maphash (lambda (key value)
+                  (setq retval (append retval (list (list key value)))))
+                dict)
+       retval)
+    (increase-hash (car l) dict) ; Иначе - увеличить значение по ключу из головы l
+    (setq l (cdr l)))) ; и убрать из l голову
+
  (defun is-subset (b a)
            (loop for x in b
                  if (null (is-member a x)) return nil
