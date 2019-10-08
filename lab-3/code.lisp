@@ -31,13 +31,34 @@
 ;; conj работает как cons, но вместо точечных пар формирует список (a b)
 (defun conj (a b)
   (cond
-    ((and (atom b) (null (null b))) (cons a (cons b nil))) ; Если b - атом, не равный nil, сконструировать список a:[b]
+    ;;((and (atom b) (null (null b))) (cons a (cons b nil))) ; Если b - атом, не равный nil, сконструировать список a:[b]
+    ((one-element-p a) (cons (car a) b))
     (T (cons a b))))
+
+;; one-element-p проверяет, является ли x списком из одного элемента
+(defun one-element-p (x)
+  (and (listp x) (car x) (null (cdr x))))
+
+;; conj работает как cons, но голову формирующегося списка (левую часть cons-ячейки), являющуюся списком из одного элемента, разворачивает в сам элемент
+(defun conj (a b)
+  (cond
+    ((one-element-p a) (cons (car a) b))
+    (T (cons a b))))
+
+;; flatten в списке произвольной структуры каждый подсписок из одного атома заменяет на сам атом
+(defun flatten (x)
+  (cond
+    ((null x) nil)
+    ((atom x) x)
+    (T (conj (flatten (car x)) (flatten (cdr x))))))
+
+(defun wrap-back (x)
+  (if (listp x) (list x) x))
 
 ; flatten в списке произвольной структуры каждый подсписок из одного атома заменяет на сам атом.
 (defun flatten (x)
   (cond
     ((null x) nil)
     ((atom x) x)
-    ((one-element-p x) (flatten (car x)))
+    ;;((one-element-p x) (wrap-back (flatten (car x))))
     (T (conj (flatten (car x)) (flatten (cdr x))))))
