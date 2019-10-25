@@ -32,6 +32,7 @@ def task_1_var_7(line=None, separator=None):
     # Получить новый список чередованием элементов списка и произвольной строки
     joined_words = flatten(map(lambda x: [x, separator], words))
     print(joined_words)
+
     # Получить список всех элементов, которые состоят из прописных букв
     lowercase_words = list(filter(str.islower, joined_words))
     print(lowercase_words)
